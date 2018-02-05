@@ -14,11 +14,11 @@ typedef struct data {
     float acc[3];
     float gry[3];
     float ang[3];
-//    int sta[4];
-} *Data;
+    unsigned long tim;
+} Data;
 
-Data head;
-Data tail;
+static Data *head = new Data();
+static Data *tail = new Data();
 static int len;
 
 //union SeFrame {
@@ -31,15 +31,15 @@ static int len;
 
 
 SoftwareSerial BT(10, 11); 
-
-void freeData(Data data) {
+// 10 listen, 11 write
+void freeData(Data *data) {
     data -> prev -> next = data -> next;
     data -> next -> prev = data -> prev;
     len --;
-    free(data);
+    delete(data);
 }
 
-void addDataToTail(Data data) {
+void addDataToTail(Data *data) {
   data -> next = tail;
   data -> prev = tail -> prev;
   tail -> prev -> next = data;
@@ -55,7 +55,8 @@ void addDataToTail(Data data) {
 //    Serial.write(Sefram.Byte[3]); 
 //}
 
-void SendToSerial(Data data) {
+void SendToSerial(Data *data) {
+  
   Serial.print("a");
   for (int i = 0; i < 3; i ++) {
     Serial.print(data -> acc[i]);
@@ -71,37 +72,32 @@ void SendToSerial(Data data) {
     Serial.print(data -> ang[i]);
     Serial.print(" ");
   }
-//  Serial.print("s");
-//  for (int i = 0; i < 4; i ++) {
-//    Serial.print(data -> sta[i]);
-//    Serial.print(" ");
-//  }
+  Serial.print("[");
+  Serial.print(data -> tim);
+  Serial.print("]");
 }
 
-void getAcc(Data data) {
+void getAcc(Data *data) {
   data -> acc[0] = (float)JY901.stcAcc.a[0] / 32768 * 16;
   data -> acc[1] = (float)JY901.stcAcc.a[1] / 32768 * 16;
   data -> acc[2] = (float)JY901.stcAcc.a[2] / 32768 * 16;
 }
 
-void getGryo(Data data) {
+void getGryo(Data *data) {
   data -> gry[0] = (float)JY901.stcGyro.w[0] / 32768 * 2000;
   data -> gry[1] = (float)JY901.stcGyro.w[1] / 32768 * 2000;
   data -> gry[2] = (float)JY901.stcGyro.w[2] / 32768 * 2000;
 }
 
-void getAng(Data data) {
+void getAng(Data *data) {
   data -> ang[0] = (float)JY901.stcAngle.Angle[0] / 32768 * 180;
   data -> ang[1] = (float)JY901.stcAngle.Angle[1] / 32768 * 180;
   data -> ang[2] = (float)JY901.stcAngle.Angle[2] / 32768 * 180;
 }
 
-//void getSta(Data data) {
-//  data -> sta[0] = JY901.stcDStatus.sDStatus[0];
-//  data -> sta[1] = JY901.stcDStatus.sDStatus[1];
-//  data -> sta[2] = JY901.stcDStatus.sDStatus[2];
-//  data -> sta[3] = JY901.stcDStatus.sDStatus[3];
-//}
+void getTime(Data *data) {
+  data -> tim = millis();
+}
 
 void setup() {
   Serial.begin(9600);
@@ -112,25 +108,24 @@ void setup() {
 }
 
 void loop() {
-  Data data;
+  Data *data = new Data();
   getAcc(data);
   getGryo(data);
   getAng(data);
-//  getSta(data);
+  getTime(data);
+  
   if (len >= maxLength) {
     freeData(head -> next);
   }
   addDataToTail(data);
   if (Serial.available()) {
-    delay(500);
     int l = len;
     for (int i = 0; i < l; i ++) {
-      Serial.write("//");
       SendToSerial(head -> next);
       freeData(head -> next);
     }
   }
-  delay(20); //50 hz
+  delay(50); //20 hz
 }
 /*
   SerialEvent occurs whenever a new data comes in the
