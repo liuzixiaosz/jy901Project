@@ -11,7 +11,7 @@
 typedef struct data {
     struct data *next;
     struct data *prev;
-    float acc[3];
+    float acc[3];                                                                        
     float gry[3];
     float ang[3];
     unsigned long tim;
@@ -21,60 +21,69 @@ static Data *head = new Data();
 static Data *tail = new Data();
 static int len;
 
-//union SeFrame {
-//  float Float;
-//  byte Byte[4];
-//};
-//
-//SeFrame Sefram;
-
-
-
-SoftwareSerial BT(10, 11); 
-// 10 listen, 11 write
+SoftwareSerial BTSerial(10, 11); 
+// left listen, right write
 void freeData(Data *data) {
-    data -> prev -> next = data -> next;
-    data -> next -> prev = data -> prev;
-    len --;
-    delete(data);
+  if (data == tail) {
+    return;
+  }
+  data -> prev -> next = data -> next;
+  data -> next -> prev = data -> prev;
+  len --;
+  delete(data);
+  data = NULL;
 }
 
 void addDataToTail(Data *data) {
   data -> next = tail;
   data -> prev = tail -> prev;
-  tail -> prev -> next = data;
+  data -> prev -> next = data;
   tail -> prev = data;
   len ++;
 }
-  
-//void Send_float(float FLOAT) { 
-//    Sefram.Float= FLOAT;
-//    Serial.write(Sefram.Byte[0]);
-//    Serial.write(Sefram.Byte[1]);
-//    Serial.write(Sefram.Byte[2]);
-//    Serial.write(Sefram.Byte[3]); 
+
+//void SendToSerial(Data *data) {
+//  
+//  Serial.print("a");
+//  for (int i = 0; i < 3; i ++) {
+//    Serial.print(data -> acc[i]);
+//    Serial.print(" ");
+//  }
+//  Serial.print("g");
+//  for (int i = 0; i < 3; i ++) {
+//    Serial.print(data -> gry[i]);
+//    Serial.print(" ");
+//  }
+//  Serial.print("A");
+//  for (int i = 0; i < 3; i ++) {
+//    Serial.print(data -> ang[i]);
+//    Serial.print(" ");
+//  }
+//  Serial.print("[");
+//  Serial.print(data -> tim);
+//  Serial.print("]");
 //}
 
 void SendToSerial(Data *data) {
   
-  Serial.print("a");
+  BTSerial.write("a");
   for (int i = 0; i < 3; i ++) {
-    Serial.print(data -> acc[i]);
-    Serial.print(" ");
+    BTSerial.write(data -> acc[i]);
+    BTSerial.write(" ");
   }
-  Serial.print("g");
+  BTSerial.write("g");
   for (int i = 0; i < 3; i ++) {
-    Serial.print(data -> gry[i]);
-    Serial.print(" ");
+    BTSerial.write(data -> gry[i]);
+    BTSerial.write(" ");
   }
-  Serial.print("A");
+  BTSerial.write("A");
   for (int i = 0; i < 3; i ++) {
-    Serial.print(data -> ang[i]);
-    Serial.print(" ");
+    BTSerial.write(data -> ang[i]);
+    BTSerial.write(" ");
   }
-  Serial.print("[");
-  Serial.print(data -> tim);
-  Serial.print("]");
+  BTSerial.write("[");
+  BTSerial.write(data -> tim);
+  BTSerial.write("]");
 }
 
 void getAcc(Data *data) {
@@ -101,7 +110,7 @@ void getTime(Data *data) {
 
 void setup() {
   Serial.begin(9600);
-  BT.begin(9600);
+  BTSerial.begin(9600);
   len = 0;
   head -> next = tail;
   tail -> prev = head;
@@ -118,22 +127,16 @@ void loop() {
     freeData(head -> next);
   }
   addDataToTail(data);
-  if (Serial.available()) {
+  if (BTSerial.available()) {
+//  if (Serial.available()) {
     int l = len;
     for (int i = 0; i < l; i ++) {
       SendToSerial(head -> next);
       freeData(head -> next);
     }
   }
-  delay(50); //20 hz
+  delay(500); //0.5s
 }
-/*
-  SerialEvent occurs whenever a new data comes in the
- hardware serial RX.  This routine is run between each
- time loop() runs, so using delay inside loop can delay
- response.  Multiple bytes of data may be available.
- */
-
 
 void serialEvent() {
   while (Serial.available()) {
