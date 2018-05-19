@@ -3,11 +3,11 @@
  * Acc：加速度， Gryo：陀螺仪，Ang：角度
  */
 
-# include <Wire.h>
-# include <JY901.h>
-# include <SoftwareSerial.h>
+#include <Wire.h>
+#include <JY901.h>
+#include <SoftwareSerial.h>
 
-# define maxLength 1500
+#define maxLength 1500
 
 typedef struct data {
   struct data *next;
