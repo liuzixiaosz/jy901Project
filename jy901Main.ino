@@ -35,6 +35,7 @@ void freeData(Data *data) {
   data->prev = NULL;
   data->next = NULL;
   delete data;
+  data = NULL;
 }
 
 void addDataToTail(Data *data) {
