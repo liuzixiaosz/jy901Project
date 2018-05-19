@@ -13,7 +13,7 @@ typedef struct data {
   struct data *next;
   struct data *prev;
   float acc[3];
-  float gry[3];
+  //float gry[3];
   float ang[3];
   unsigned long tim;
 } Data;
@@ -77,11 +77,11 @@ void SendToSerial(Data *data) {
 	 BTSerial.print(data->acc[i]);
 	 BTSerial.print(" ");
   }
-  BTSerial.print("g");
-  for (int i = 0; i < 3; i++) {
-	 BTSerial.print(data->gry[i]);
-	 BTSerial.print(" ");
-  }
+  // BTSerial.print("g");
+  // for (int i = 0; i < 3; i++) {
+	//  BTSerial.print(data->gry[i]);
+	//  BTSerial.print(" ");
+  // }
   BTSerial.print("A");
   for (int i = 0; i < 3; i++) {
 	 BTSerial.print(data->ang[i]);
@@ -98,11 +98,11 @@ void getAcc(Data *data) {
   data->acc[2] = (float) JY901.stcAcc.a[2] / 32768 * 16;
 }
 
-void getGryo(Data *data) {
-  data->gry[0] = (float) JY901.stcGyro.w[0] / 32768 * 2000;
-  data->gry[1] = (float) JY901.stcGyro.w[1] / 32768 * 2000;
-  data->gry[2] = (float) JY901.stcGyro.w[2] / 32768 * 2000;
-}
+// void getGryo(Data *data) {
+//   data->gry[0] = (float) JY901.stcGyro.w[0] / 32768 * 2000;
+//   data->gry[1] = (float) JY901.stcGyro.w[1] / 32768 * 2000;
+//   data->gry[2] = (float) JY901.stcGyro.w[2] / 32768 * 2000;
+// }
 
 void getAng(Data *data) {
   data->ang[0] = (float) JY901.stcAngle.Angle[0] / 32768 * 180;
@@ -127,7 +127,7 @@ void setup() {
 void loop() {
   Data *data = new Data();
   getAcc(data);
-  getGryo(data);
+  // getGryo(data);
   getAng(data);
   getTime(data);
 
