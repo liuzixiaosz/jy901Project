@@ -32,8 +32,9 @@ void freeData(Data *data) {
   data->prev->next = data->next;
   data->next->prev = data->prev;
   len--;
+  data->prev = NULL;
+  data->next = NULL;
   delete (data);
-  data = NULL;
 }
 
 void addDataToTail(Data *data) {
@@ -119,6 +120,8 @@ void setup() {
   len = 0;
   head->next = tail;
   tail->prev = head;
+  tail->next = NULL;
+  head->prev = NULL;
 }
 
 void loop() {
