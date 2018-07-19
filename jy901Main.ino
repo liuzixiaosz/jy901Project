@@ -76,7 +76,7 @@ void SendToSerial(Data *data) {
   BTSerial.print("a");
   for (int i = 0; i < 3; i++) {
 	 BTSerial.print(data->acc[i]);
-	 BTSerial.print(" ");
+	 BTSerial.print(",");
   }
   // BTSerial.print("g");
   // for (int i = 0; i < 3; i++) {
@@ -86,7 +86,7 @@ void SendToSerial(Data *data) {
   BTSerial.print("A");
   for (int i = 0; i < 3; i++) {
 	 BTSerial.print(data->ang[i]);
-	 BTSerial.print(" ");
+	 BTSerial.print(",");
   }
   BTSerial.print("[");
   BTSerial.print(data->tim);
